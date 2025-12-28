@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Junk Removal Profit Margin Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 2rem 1rem;
+            font-family: 'Space Grotesk', -apple-system, sans-serif;
+            color: #fff;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .glow-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+        }
+        .header { text-align: center; margin-bottom: 3rem; animation: slideIn 0.5s ease-out; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 0.75rem;
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            padding: 0.5rem 1.5rem; border-radius: 9999px; margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+        }
+        .badge span { color: #000; font-weight: 700; font-size: 1.125rem; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.2; }
+        .subtitle { color: rgba(255, 255, 255, 0.7); font-size: 1.125rem; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+        @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
+        .section-title {
+            font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .form-group { margin-bottom: 1rem; }
+        label {
+            color: rgba(255, 255, 255, 0.9); display: block; margin-bottom: 0.5rem;
+            font-weight: 500; font-size: 0.9rem;
+        }
+        select, input {
+            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px; color: #fff; padding: 0.75rem; width: 100%;
+            font-family: 'Space Grotesk', sans-serif; font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        select:focus, input:focus {
+            outline: none; border-color: #4ade80;
+            box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.1);
+        }
+        option { background: #1a1a2e; color: #fff; }
+        small {
+            display: block; margin-top: 0.25rem; font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .checkbox-container {
+            display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05); border-radius: 8px;
+            cursor: pointer; transition: all 0.3s ease; margin-bottom: 0.5rem;
+        }
+        .checkbox-container:hover { background: rgba(255, 255, 255, 0.08); }
+        input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-color: #4ade80; }
+        .info-box { padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.875rem; }
+        .info-box.green { background: rgba(74, 222, 128, 0.1); border-left: 3px solid #4ade80; color: rgba(255, 255, 255, 0.9); }
+        .info-box.yellow { background: rgba(251, 191, 36, 0.1); border-left: 3px solid #fbbf24; color: rgba(255, 255, 255, 0.9); }
+        .icon { width: 24px; height: 24px; display: inline-block; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .progress-bar { width: 100%; height: 12px; background: rgba(255, 255, 255, 0.1); border-radius: 9999px; overflow: hidden; }
+        .progress-fill { height: 100%; transition: width 0.5s ease; border-radius: 9999px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 0.75rem 0.5rem; text-align: left; }
+        th { color: rgba(255, 255, 255, 0.9); font-weight: 600; border-bottom: 2px solid rgba(255, 255, 255, 0.1); }
+        td { color: rgba(255, 255, 255, 0.8); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        tr:last-child td { border-bottom: none; }
+        .price-table td:last-child { text-align: right; color: #4ade80; font-weight: 600; }
+        .footer { text-align: center; margin-top: 3rem; padding: 1.5rem; background: rgba(255, 255, 255, 0.03); border-radius: 12px; }
+        .footer p { color: rgba(255, 255, 255, 0.6); font-size: 0.875rem; }
+        .footer strong { color: #4ade80; }
+        #recalculateBtn {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: #000;
+            font-weight: 700;
+            font-size: 1.125rem;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(74, 222, 128, 0.4);
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 400px;
+        }
+        #recalculateBtn:active { transform: scale(0.98); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="badge">
+                <svg class="icon" fill="none" stroke="#000" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span>Profit Margin Calculator</span>
+            </div>
+            <h1>Junk Removal Pricing Analyzer</h1>
+            <p class="subtitle">Quote any job: volume-based, specialty items, or mixed jobs</p>
+        </div>
+
+        <div class="grid">
+            <div class="glow-card">
+                <h2 class="section-title">
+                    <svg class="icon" fill="none" stroke="#4ade80" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                    Quote This Job
+                </h2>
+
+                <div class="info-box yellow">
+                    <p style="margin: 0;">Choose your job type and enter your pricing to analyze profit margins.</p>
+                </div>
+
+                <h3 style="color: rgba(255, 255, 255, 0.9); font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Job Type</h3>
+
+                <div class="form-group">
+                    <label>What are you quoting?</label>
+                    <select id="jobType">
+                        <option value="volume">Volume-Based (by truck load)</option>
+                        <option value="specialty">Specialty Item Removal</option>
+                        <option value="mixed">Mixed (Specialty + Volume)</option>
+                    </select>
+                </div>
+
+                <!-- Volume Section -->
+                <div id="volumeSection">
+                    <div class="form-group">
+                        <label>Load Size</label>
+                        <select id="analyzeLoadSize">
+                            <option value="minimum">Minimum Pickup (1-2 items)</option>
+                            <option value="quarter">1/4 Load</option>
+                            <option value="half" selected>1/2 Load</option>
+                            <option value="threeQuarter">3/4 Load</option>
+                            <option value="full">Full Load</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Your Price for This Load ($)</label>
+                        <input type="number" id="loadPrice" value="325" min="0">
+                    </div>
+                </div>
+
+                <!-- Specialty Section -->
+                <div id="specialtySection" style="display: none;">
+                    <div class="form-group">
+                        <label>Specialty Item Type</label>
+                        <select id="specialtyType">
+                            <option value="hottub">Hot Tub Removal</option>
+                            <option value="trampoline">Trampoline Removal</option>
+                            <option value="playset">Play Set Removal</option>
+                            <option value="shed">Shed Removal/Demo</option>
+                            <option value="pool">Above Ground Pool Removal</option>
+                            <option value="piano">Piano Removal</option>
+                            <option value="custom">Custom Specialty Item</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Your Price for This Item ($)</label>
+                        <input type="number" id="specialtyPrice" value="500" min="0">
+                    </div>
+
+                    <div class="info-box green" style="margin-top: 1rem;">
+                        <p style="margin: 0; font-size: 0.875rem;">
+                            <strong>💡 Specialty Pricing Tip:</strong> Factor in labor hours, equipment needs (saws, tools), 
+                            disposal fees, and complexity. Hot tubs and pools often need cutting/disassembly. 
+                            Sheds may require demo permits.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Mixed Section -->
+                <div id="mixedSection" style="display: none;">
+                    <div style="background: rgba(74, 222, 128, 0.1); border-left: 3px solid #4ade80; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <h4 style="color: #4ade80; font-weight: 600; margin-bottom: 0.5rem;">Mixed Job Pricing</h4>
+                        <p style="margin: 0; font-size: 0.875rem;">Enter pricing for BOTH the specialty item and additional volume-based junk.</p>
+                    </div>
+
+                    <h4 style="color: rgba(255, 255, 255, 0.9); font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem;">Specialty Item:</h4>
+                    <div class="form-group">
+                        <label>Item Type</label>
+                        <select id="mixedSpecialtyType">
+                            <option value="hottub">Hot Tub</option>
+                            <option value="trampoline">Trampoline</option>
+                            <option value="playset">Play Set</option>
+                            <option value="shed">Shed/Demo</option>
+                            <option value="pool">Above Ground Pool</option>
+                            <option value="piano">Piano</option>
+                            <option value="custom">Custom Item</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Specialty Item Price ($)</label>
+                        <input type="number" id="mixedSpecialtyPrice" value="500" min="0">
+                    </div>
+
+                    <h4 style="color: rgba(255, 255, 255, 0.9); font-size: 0.95rem; font-weight: 600; margin: 1rem 0 0.75rem;">Additional Volume:</h4>
+                    <div class="form-group">
+                        <label>Additional Load Size</label>
+                        <select id="mixedLoadSize">
+                            <option value="none">None</option>
+                            <option value="minimum">Minimum (1-2 items)</option>
+                            <option value="quarter" selected>1/4 Load</option>
+                            <option value="half">1/2 Load</option>
+                            <option value="threeQuarter">3/4 Load</option>
+                            <option value="full">Full Load</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Additional Load Price ($)</label>
+                        <input type="number" id="mixedLoadPrice" value="200" min="0">
+                        <small>Price for the extra junk beyond the specialty item</small>
+                    </div>
+                </div>
+
+                <h3 style="color: rgba(255, 255, 255, 0.9); font-size: 1rem; font-weight: 600; margin: 1.5rem 0 1rem;">Job Complexity</h3>
+
+                <div style="margin-bottom: 1rem;">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="applyStairs">
+                        <span style="flex: 1;">Stairs</span>
+                    </label>
+                    <div style="padding-left: 2rem; margin-top: 0.5rem;">
+                        <label style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 0.25rem;">Additional Charge ($)</label>
+                        <input type="number" id="stairsCharge" value="75" min="0" style="padding: 0.5rem;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="applyDisassembly">
+                        <span style="flex: 1;">Disassembly</span>
+                    </label>
+                    <div style="padding-left: 2rem; margin-top: 0.5rem;">
+                        <label style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 0.25rem;">Additional Charge ($)</label>
+                        <input type="number" id="disassemblyCharge" value="50" min="0" style="padding: 0.5rem;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="applyExtraLabor">
+                        <span style="flex: 1;">Extra Labor / Heavy Items</span>
+                    </label>
+                    <div style="padding-left: 2rem; margin-top: 0.5rem;">
+                        <label style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 0.25rem;">Additional Charge ($)</label>
+                        <input type="number" id="extraLaborCharge" value="100" min="0" style="padding: 0.5rem;">
+                    </div>
+                </div>
+
+                <div class="info-box green" style="margin-top: 1.5rem;">
+                    <h4 style="color: #4ade80; font-weight: 600; margin-bottom: 0.5rem;">💡 Pricing Pro Tip: Debris Type Matters!</h4>
+                    <p style="margin: 0; font-size: 0.875rem; line-height: 1.6;">
+                        <strong>Adjust your load price based on disposal costs:</strong><br><br>
+                        
+                        <strong style="color: #ef4444;">Higher Price:</strong> Wood, construction debris, concrete, dirt → Must go to landfill (high dump fees)<br><br>
+                        
+                        <strong style="color: #4ade80;">Lower Price:</strong> Furniture, appliances, household items → Can be recycled or donated (low/no dump fees)<br><br>
+                        
+                        <strong style="color: #fbbf24;">Mixed Loads:</strong> Combination of both → Price in the middle<br><br>
+                        
+                        This strategy helps you win more jobs (competitive pricing on easy loads) while protecting margins (higher pricing on expensive-to-dump loads). <strong>You avoid under-bidding landfill jobs and over-bidding donation jobs!</strong>
+                    </p>
+                </div>
+
+                <h3 style="color: rgba(255, 255, 255, 0.9); font-size: 1rem; font-weight: 600; margin: 1.5rem 0 1rem;">Your Costs for This Job</h3>
+
+                <div class="form-group">
+                    <label>Landfill / Dump Fee ($)</label>
+                    <input type="number" id="costLandfill" value="60" min="0">
+                    <small>Enter 0 if donating/recycling items</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Fuel Cost ($)</label>
+                    <input type="number" id="costFuel" value="25" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label>Labor Cost ($)</label>
+                    <input type="number" id="costLabor" value="40" min="0">
+                    <small>Total labor: rate × hours × workers</small>
+                </div>
+
+                <div style="margin-top: 2rem; text-align: center;">
+                    <button type="button" id="recalculateBtn">
+                        🔄 Update Profit Calculation
+                    </button>
+                    <p style="margin-top: 0.75rem; font-size: 0.875rem; color: rgba(255, 255, 255, 0.6);">
+                        Tap after changing any values
+                    </p>
+                </div>
+
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px; margin-top: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="color: rgba(255, 255, 255, 0.7);">Total Costs:</span>
+                        <span style="color: #fff; font-weight: 700; font-size: 1.125rem;" id="displayTotalCost">$125.00</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: rgba(255, 255, 255, 0.7);">Total Quote Price:</span>
+                        <span style="color: #4ade80; font-weight: 700; font-size: 1.125rem;" id="displayCurrentPrice">$325.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="glow-card">
+                    <h3 style="display: flex; align-items: center; gap: 0.5rem; margin: 0 0 1.5rem 0; font-size: 1.125rem; font-weight: 600;">
+                        <svg class="icon" fill="none" stroke="#4ade80" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        </svg>
+                        Current Profit Margin
+                    </h3>
+
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <div style="font-size: 4rem; font-weight: 700; line-height: 1;" id="currentMarginPercent">61.5%</div>
+                        <p style="color: rgba(255, 255, 255, 0.7); font-size: 0.875rem; margin-top: 0.5rem;">Gross Profit Margin</p>
+                    </div>
+
+                    <div class="progress-bar" style="margin-bottom: 0.5rem;">
+                        <div class="progress-fill" id="currentMarginBar" style="width: 61.5%; background: linear-gradient(90deg, #4ade80 0%, #22c55e 100%);"></div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: rgba(255, 255, 255, 0.6); margin-bottom: 1rem;">
+                        <span>0%</span>
+                        <span>30%</span>
+                        <span>50%</span>
+                        <span>100%</span>
+                    </div>
+
+                    <div id="marginStatus"></div>
+
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
+                            <span style="color: rgba(255, 255, 255, 0.7);">Revenue:</span>
+                            <span style="color: #fff; font-weight: 600;" id="displayRevenue">$325.00</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                            <span style="color: rgba(255, 255, 255, 0.7);">Costs:</span>
+                            <span style="color: #fff; font-weight: 600;" id="displayCosts">$125.00</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-top: 2px solid rgba(255, 255, 255, 0.2);">
+                            <span style="color: #4ade80; font-weight: 700;">Profit:</span>
+                            <span style="color: #4ade80; font-weight: 700; font-size: 1.25rem;" id="displayProfit">$200.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glow-card" style="margin-top: 2rem;">
+                    <h3 style="display: flex; align-items: center; gap: 0.5rem; margin: 0 0 1.5rem 0; font-size: 1.125rem; font-weight: 600;">
+                        <svg class="icon" fill="none" stroke="#4ade80" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Recommended Pricing
+                    </h3>
+
+                    <div style="background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong style="color: #ef4444;">20-30% Margin</strong>
+                                <p style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.7); margin: 0.25rem 0 0 0;">Minimum viable</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #ef4444;" id="recommendLow">$157 - $179</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(251, 191, 36, 0.1); border-left: 3px solid #fbbf24; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong style="color: #fbbf24;">31-49% Margin</strong>
+                                <p style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.7); margin: 0.25rem 0 0 0;">Moderate profit</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #fbbf24;" id="recommendMedium">$182 - $245</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(74, 222, 128, 0.1); border-left: 3px solid #4ade80; padding: 1rem; border-radius: 4px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong style="color: #4ade80;">50-65% Margin</strong>
+                                <p style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.7); margin: 0.25rem 0 0 0;">Target zone ✓</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 1.5rem; font-weight: 700; color: #4ade80;" id="recommendHigh">$250 - $357</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div class="glow-card">
+                <h4 style="color: #4ade80; font-size: 1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <svg class="icon" fill="none" stroke="#4ade80" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                    💡 Pro Tips
+                </h4>
+                <ul style="color: rgba(255, 255, 255, 0.8); font-size: 0.875rem; line-height: 1.6; padding-left: 1.25rem;">
+                    <li style="margin-bottom: 0.75rem;">Always quote a price range when calling customers</li>
+                    <li style="margin-bottom: 0.75rem;">Confirm the exact price when you arrive and see the actual load</li>
+                    <li style="margin-bottom: 0.75rem;">Track your actual costs weekly to stay profitable</li>
+                    <li style="margin-bottom: 0.75rem;"><strong>Donation Strategy:</strong> If you can donate items instead of dumping, keep your quote slightly lower. You'll avoid landfill fees AND maintain high profit margins—win-win!</li>
+                </ul>
+            </div>
+
+            <div class="glow-card">
+                <h4 style="color: #4ade80; font-size: 1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <svg class="icon" fill="none" stroke="#4ade80" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    National Average Pricing (USA)
+                </h4>
+                
+                <table class="price-table">
+                    <thead>
+                        <tr>
+                            <th>Load Size</th>
+                            <th style="text-align: right;">Average Range</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Minimum Pickup</td><td>$75 - $150</td></tr>
+                        <tr><td>1/4 Load</td><td>$150 - $250</td></tr>
+                        <tr><td>1/2 Load</td><td>$250 - $450</td></tr>
+                        <tr><td>3/4 Load</td><td>$400 - $600</td></tr>
+                        <tr><td>Full Load</td><td>$550 - $850</td></tr>
+                    </tbody>
+                </table>
+
+                <div style="background: rgba(251, 191, 36, 0.1); border-left: 3px solid #fbbf24; padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+                    <p style="color: rgba(255, 255, 255, 0.9); font-size: 0.875rem; line-height: 1.6; margin: 0;">
+                        <strong style="color: #fbbf24;">⚠️ Important Disclaimer:</strong> Pricing varies significantly by region. 
+                        These are national averages. <strong>Always do your own research:</strong> 
+                        call 3-5 competitors in your area. This calculator helps you maintain 
+                        high profit margins based on load type, job difficulty, and your actual overhead costs—not to set industry prices.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Part of the <strong>Pricing Mastery Template Pack</strong> • Created by Tex Mex Junk Removal</p>
+        </div>
+    </div>
+
+    <script>
+        function updateJobTypeDisplay() {
+            const jobType = document.getElementById('jobType').value;
+            document.getElementById('volumeSection').style.display = jobType === 'volume' ? 'block' : 'none';
+            document.getElementById('specialtySection').style.display = jobType === 'specialty' ? 'block' : 'none';
+            document.getElementById('mixedSection').style.display = jobType === 'mixed' ? 'block' : 'none';
+            calculate();
+        }
+
+        function calculate() {
+            try {
+                const jobType = document.getElementById('jobType').value;
+                let basePrice = 0;
+
+                if (jobType === 'volume') {
+                    basePrice = Number(document.getElementById('loadPrice').value) || 0;
+                } else if (jobType === 'specialty') {
+                    basePrice = Number(document.getElementById('specialtyPrice').value) || 0;
+                } else if (jobType === 'mixed') {
+                    const specialtyPrice = Number(document.getElementById('mixedSpecialtyPrice').value) || 0;
+                    const additionalLoadPrice = Number(document.getElementById('mixedLoadPrice').value) || 0;
+                    basePrice = specialtyPrice + additionalLoadPrice;
+                }
+
+                const stairsCharge = Number(document.getElementById('stairsCharge').value) || 0;
+                const disassemblyCharge = Number(document.getElementById('disassemblyCharge').value) || 0;
+                const extraLaborCharge = Number(document.getElementById('extraLaborCharge').value) || 0;
+
+                const applyStairs = document.getElementById('applyStairs').checked;
+                const applyDisassembly = document.getElementById('applyDisassembly').checked;
+                const applyExtraLabor = document.getElementById('applyExtraLabor').checked;
+
+                const costLandfill = Number(document.getElementById('costLandfill').value) || 0;
+                const costFuel = Number(document.getElementById('costFuel').value) || 0;
+                const costLabor = Number(document.getElementById('costLabor').value) || 0;
+
+                let totalQuotePrice = basePrice;
+                if (applyStairs) totalQuotePrice += stairsCharge;
+                if (applyDisassembly) totalQuotePrice += disassemblyCharge;
+                if (applyExtraLabor) totalQuotePrice += extraLaborCharge;
+
+                const totalCost = costLandfill + costFuel + costLabor;
+                const profit = totalQuotePrice - totalCost;
+                const margin = totalQuotePrice > 0 ? (profit / totalQuotePrice) * 100 : 0;
+
+                // Update displays
+                document.getElementById('displayTotalCost').textContent = '$' + totalCost.toFixed(2);
+                document.getElementById('displayCurrentPrice').textContent = '$' + totalQuotePrice.toFixed(2);
+                document.getElementById('currentMarginPercent').textContent = margin.toFixed(1) + '%';
+                document.getElementById('displayRevenue').textContent = '$' + totalQuotePrice.toFixed(2);
+                document.getElementById('displayCosts').textContent = '$' + totalCost.toFixed(2);
+                document.getElementById('displayProfit').textContent = '$' + profit.toFixed(2);
+
+                // Progress bar and colors
+                const marginBar = document.getElementById('currentMarginBar');
+                const marginPercent = document.getElementById('currentMarginPercent');
+                const clampedMargin = Math.min(Math.max(margin, 0), 100);
+                marginBar.style.width = clampedMargin + '%';
+
+                if (margin >= 50) {
+                    marginBar.style.background = 'linear-gradient(90deg, #4ade80 0%, #22c55e 100%)';
+                    marginPercent.style.color = '#4ade80';
+                } else if (margin >= 30) {
+                    marginBar.style.background = 'linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)';
+                    marginPercent.style.color = '#fbbf24';
+                } else {
+                    marginBar.style.background = 'linear-gradient(90deg, #ef4444 0%, #dc2626 100%)';
+                    marginPercent.style.color = '#ef4444';
+                }
+
+                // Status message
+                const statusDiv = document.getElementById('marginStatus');
+                if (margin >= 50) {
+                    statusDiv.innerHTML = '<div style="background: rgba(74, 222, 128, 0.1); border-left: 3px solid #4ade80; padding: 1rem; border-radius: 4px;"><p style="color: #4ade80; font-weight: 600; margin: 0;">✓ Excellent! You\'re in the target profit zone.</p></div>';
+                } else if (margin >= 30) {
+                    statusDiv.innerHTML = '<div style="background: rgba(251, 191, 36, 0.1); border-left: 3px solid #fbbf24; padding: 1rem; border-radius: 4px;"><p style="color: #fbbf24; font-weight: 600; margin: 0;">⚠ Moderate margin. Consider increasing prices to reach 50%+.</p></div>';
+                } else if (margin >= 0) {
+                    statusDiv.innerHTML = '<div style="background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; padding: 1rem; border-radius: 4px;"><p style="color: #ef4444; font-weight: 600; margin: 0;">⚠ Low margin! Increase prices immediately.</p></div>';
+                } else {
+                    statusDiv.innerHTML = '<div style="background: rgba(239, 68, 68, 0.15); border-left: 3px solid #ef4444; padding: 1rem; border-radius: 4px;"><p style="color: #ef4444; font-weight: 700; margin: 0;">🚨 LOSING MONEY! Adjust immediately!</p></div>';
+                }
+
+                // Recommended pricing
+                if (totalCost > 0) {
+                    const lowMin = Math.ceil(totalCost / 0.80);
+                    const lowMax = Math.ceil(totalCost / 0.70);
+                    const medMin = Math.ceil(totalCost / 0.69);
+                    const medMax = Math.ceil(totalCost / 0.51);
+                    const highMin = Math.ceil(totalCost / 0.50);
+                    const highMax = Math.ceil(totalCost / 0.35);
+
+                    document.getElementById('recommendLow').textContent = '$' + lowMin + ' - $' + lowMax;
+                    document.getElementById('recommendMedium').textContent = '$' + medMin + ' - $' + medMax;
+                    document.getElementById('recommendHigh').textContent = '$' + highMin + ' - $' + highMax;
+                } else {
+                    document.getElementById('recommendLow').textContent = 'Enter costs';
+                    document.getElementById('recommendMedium').textContent = 'Enter costs';
+                    document.getElementById('recommendHigh').textContent = 'Enter costs';
+                }
+            } catch (error) {
+                console.error('Calculation error:', error);
+                alert('Calculation error: ' + error.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const inputs = document.querySelectorAll('input[type="number"], input[type="checkbox"], select');
+            inputs.forEach(el => {
+                el.addEventListener('input', calculate);
+                el.addEventListener('change', calculate);
+                if (el.type === 'checkbox') el.addEventListener('click', calculate);
+            });
+
+            document.getElementById('jobType').addEventListener('change', updateJobTypeDisplay);
+
+            const btn = document.getElementById('recalculateBtn');
+            btn.addEventListener('click', function() {
+                calculate();
+                btn.textContent = '✓ Updated!';
+                btn.style.background = '#22c55e';
+                setTimeout(() => {
+                    btn.textContent = '🔄 Update Profit Calculation';
+                    btn.style.background = 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)';
+                }, 1500);
+            });
+
+            updateJobTypeDisplay();
+            calculate();
+        });
+    </script>
+</body>
+</html>
